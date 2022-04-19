@@ -36,7 +36,7 @@ def register():
 def login():
     #check if username exists in database
     data = { "email": request.form['email']}
-    user_in_db = user.User.get_user_by_emal(data)
+    user_in_db = user.User.get_user_by_email(data)
     #if it doesn't, redirect to login page
     if not user_in_db:
         flash("Invalid Email/Password")
@@ -46,8 +46,19 @@ def login():
     if not bcrypt.check_password_hash(user_in_db.password, request.form['password']):
         flash("Invalid Password")
         return redirect('/')
-    #if pw does match:
+    #if pw does match, redirect to dashboard -- user logged in:
     session['user_id'] = user_in_db.id
-    redirect('/dashboard')
+    return redirect('/dashboard')
 
-    #if pw hashes match, redirect to dashboard -- user logged in
+@app.route('/dashboard')
+def dashboard():
+    data = {
+        id:"id"
+    }
+    current_user = user.User.get_one(data)
+    return render_template('dashboard.html', current_user = current_user)
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return render_template('home.html')

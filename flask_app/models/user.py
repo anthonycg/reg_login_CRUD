@@ -17,16 +17,22 @@ class User:
         self.updated_at = data['updated_at']
 
     @classmethod
+    def get_one(cls, data):
+        query = "SELECT * FROM users WHERE id = %(id)s"
+        results = connectToMySQL('reg_login').query_db(query, data)
+        return results
+
+    @classmethod
     def save(cls, data):
         query = "INSERT INTO users (first_name, last_name, email, password, created_at, updated_at) VALUES (%(first_name)s,%(last_name)s,%(email)s,%(password)s, NOW(), NOW())"
         results = connectToMySQL('reg_login').query_db(query, data)
         return results
 
     @classmethod
-    def get_user_by_emal(cls, data):
+    def get_user_by_email(cls, data):
         query = "SELECT * FROM users WHERE email = %(email)s;"
         results = connectToMySQL('reg_login').query_db(query, data)
-        return results
+        return cls(results[0])
 
     @staticmethod
     def validate_form(form):
