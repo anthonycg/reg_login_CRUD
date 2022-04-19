@@ -17,10 +17,19 @@ class User:
         self.updated_at = data['updated_at']
 
     @classmethod
+    def get_all(cls):
+        query = "SELECT * FROM users;"
+        results = connectToMySQL('reg_login').query_db(query)
+        users = []
+        for user in users:
+            users.append(cls(user))
+        return results
+
+    @classmethod
     def get_one(cls, data):
         query = "SELECT * FROM users WHERE id = %(id)s"
         results = connectToMySQL('reg_login').query_db(query, data)
-        return results
+        return cls(results[0])
 
     @classmethod
     def save(cls, data):
@@ -32,10 +41,12 @@ class User:
     def get_user_by_email(cls, data):
         query = "SELECT * FROM users WHERE email = %(email)s;"
         results = connectToMySQL('reg_login').query_db(query, data)
+        if len(results) < 1:
+            return False
         return cls(results[0])
 
     @staticmethod
-    def validate_form(form):
+    def validate_register(form):
         is_valid = True
         if len(form['first_name']) < 2:
             flash("First name must be at least 2 characters.")
